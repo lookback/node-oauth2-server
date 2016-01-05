@@ -122,6 +122,46 @@ describe('AuthCodeGrant', function() {
       .expect(400, /redirect_uri does not match/i, done);
   });
 
+  it('should allow wildcard chromiumapp redirect_uris', function (done) {
+    var app = bootstrap({
+      getClient: function (clientId, clientSecret, callback) {
+        callback(false, {
+          clientId: 'thom',
+          redirectUri: 'https://*.chromiumapp.org/oauth2'
+        });
+      }
+    });
+
+    request(app)
+      .post('/authorise')
+      .send({
+        response_type: 'code',
+        client_id: 'thom',
+        redirect_uri: 'https://ccljkeoplkplgeanjainhelfopgdgkba.chromiumapp.org/oauth2'
+      })
+      .expect(302, done);
+  });
+
+  it('should detect mismatching chromiumapp redirect_uris', function (done) {
+    var app = bootstrap({
+      getClient: function (clientId, clientSecret, callback) {
+        callback(false, {
+          clientId: 'thom',
+          redirectUri: 'https://*.chromiumapp.org/oauth2'
+        });
+      }
+    });
+
+    request(app)
+      .post('/authorise')
+      .send({
+        response_type: 'code',
+        client_id: 'thom',
+        redirect_uri: 'https://Incorrectpatternlength.chromiumapp.org/oauth2'
+      })
+      .expect(400, /redirect_uri does not match/i, done);
+  });
+
   it('should detect mismatching redirect_uri within an array', function (done) {
     var app = bootstrap({
       getClient: function (clientId, clientSecret, callback) {
@@ -159,7 +199,27 @@ describe('AuthCodeGrant', function() {
         client_id: 'thom',
         redirect_uri: 'http://nightworld.com'
       })
-      .expect(302, /Moved temporarily/i, done);
+      .expect(302, done);
+  });
+
+  it('should accept a valid chromiumapp wildcard redirect_uri within an array', function (done) {
+    var app = bootstrap({
+      getClient: function (clientId, clientSecret, callback) {
+        callback(false, {
+          clientId: 'thom',
+          redirectUri: ['https://*.chromiumapp.org/oauth2', 'http://dayworld.com']
+        });
+      }
+    });
+
+    request(app)
+      .post('/authorise')
+      .send({
+        response_type: 'code',
+        client_id: 'thom',
+        redirect_uri: 'https://ccljkeoplkplgeanjainhelfopgdgkba.chromiumapp.org/oauth2'
+      })
+      .expect(302, done);
   });
 
   it('should accept a valid redirect_uri with a string', function (done) {
@@ -179,7 +239,7 @@ describe('AuthCodeGrant', function() {
         client_id: 'thom',
         redirect_uri: 'http://nightworld.com'
       })
-      .expect(302, /Moved temporarily/i, done);
+      .expect(302, done);
   });
 
   it('should detect user access denied', function (done) {
