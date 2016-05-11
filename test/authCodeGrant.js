@@ -122,12 +122,12 @@ describe('AuthCodeGrant', function() {
       .expect(400, /redirect_uri does not match/i, done);
   });
 
-  it('should allow wildcard chromiumapp redirect_uris', function (done) {
+  it('should allow wildcard redirect_uris', function (done) {
     var app = bootstrap({
       getClient: function (clientId, clientSecret, callback) {
         callback(false, {
           clientId: 'thom',
-          redirectUri: 'https://*.chromiumapp.org/oauth2'
+          redirectUri: 'https://*.foo.org/oauth2'
         });
       }
     });
@@ -137,17 +137,17 @@ describe('AuthCodeGrant', function() {
       .send({
         response_type: 'code',
         client_id: 'thom',
-        redirect_uri: 'https://ccljkeoplkplgeanjainhelfopgdgkba.chromiumapp.org/oauth2'
+        redirect_uri: 'https://lol.foo.org/oauth2'
       })
       .expect(302, done);
   });
 
-  it('should detect mismatching chromiumapp redirect_uris', function (done) {
+  it('should allow wildcard redirect_uris with several subdomains', function (done) {
     var app = bootstrap({
       getClient: function (clientId, clientSecret, callback) {
         callback(false, {
           clientId: 'thom',
-          redirectUri: 'https://*.chromiumapp.org/oauth2'
+          redirectUri: 'https://*.foo.org/oauth2'
         });
       }
     });
@@ -157,9 +157,9 @@ describe('AuthCodeGrant', function() {
       .send({
         response_type: 'code',
         client_id: 'thom',
-        redirect_uri: 'https://Incorrectpatternlength.chromiumapp.org/oauth2'
+        redirect_uri: 'https://lol.bar.far.foo.org/oauth2'
       })
-      .expect(400, /redirect_uri does not match/i, done);
+      .expect(302, done);
   });
 
   it('should detect mismatching redirect_uri within an array', function (done) {
@@ -202,12 +202,12 @@ describe('AuthCodeGrant', function() {
       .expect(302, done);
   });
 
-  it('should accept a valid chromiumapp wildcard redirect_uri within an array', function (done) {
+  it('should accept a valid wildcard redirect_uri within an array', function (done) {
     var app = bootstrap({
       getClient: function (clientId, clientSecret, callback) {
         callback(false, {
           clientId: 'thom',
-          redirectUri: ['https://*.chromiumapp.org/oauth2', 'http://dayworld.com']
+          redirectUri: ['https://*.foo.org/oauth2', 'http://dayworld.com']
         });
       }
     });
@@ -217,7 +217,7 @@ describe('AuthCodeGrant', function() {
       .send({
         response_type: 'code',
         client_id: 'thom',
-        redirect_uri: 'https://ccljkeoplkplgeanjainhelfopgdgkba.chromiumapp.org/oauth2'
+        redirect_uri: 'https://lol.foo.org/oauth2'
       })
       .expect(302, done);
   });
