@@ -122,6 +122,26 @@ describe('AuthCodeGrant', function() {
       .expect(400, /redirect_uri does not match/i, done);
   });
 
+  it('should detect mismatching wildcard redirect_uri with a string', function (done) {
+    var app = bootstrap({
+      getClient: function (clientId, clientSecret, callback) {
+        callback(false, {
+          clientId: 'thom',
+          redirectUri: 'https://*.foo.com/oauth'
+        });
+      }
+    });
+
+    request(app)
+      .post('/authorise')
+      .send({
+        response_type: 'code',
+        client_id: 'thom',
+        redirect_uri: 'https://bar.foo.com/oauth2'
+      })
+      .expect(400, /redirect_uri does not match/i, done);
+  });
+
   it('should allow wildcard redirect_uris', function (done) {
     var app = bootstrap({
       getClient: function (clientId, clientSecret, callback) {
