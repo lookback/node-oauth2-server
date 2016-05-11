@@ -50,7 +50,7 @@ var bootstrap = function (oauthConfig) {
 
 describe('Lockdown pattern', function() {
 
-  it('should substitute grant', function (done) {
+  it.skip('should substitute grant', function (done) {
     var app = bootstrap();
 
     request(app)
@@ -58,7 +58,7 @@ describe('Lockdown pattern', function() {
       .expect(400, /method must be POST/i, done);
   });
 
-  it('should insert authorise by default', function (done) {
+  it.skip('should insert authorise by default', function (done) {
     var app = bootstrap();
 
     request(app)
@@ -80,7 +80,7 @@ describe('Lockdown pattern', function() {
       .expect(200, /hello/i, done);
   });
 
-  it('should correctly bypass', function (done) {
+  it.skip('should correctly bypass', function (done) {
     var app = bootstrap();
 
     request(app)
